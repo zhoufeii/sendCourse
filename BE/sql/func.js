@@ -67,5 +67,31 @@ module.exports = {
         });
 
         connection.end();
+    },
+    addSubject(req, res){
+        // 添加|更新 商品
+        console.log(req)
+        console.log('------------')
+        console.log(res)
+        let id = req.body.id;
+        console.log(id);
+        let name = req.body.name;
+        // let price = req.body.price;
+        let query, arr;
+
+        if (id) {
+            // 更新
+            query = 'UPDATE goods SET name=? WHERE id=?';
+            arr = [name, id];
+        } else {
+            // 新增
+            query = 'INSERT INTO subject(name) VALUES(?)';
+            arr = [name];
+        }
+
+        // func.connPool(query, arr, rows => {
+        //     res.send({code: 200, msg: 'done'});
+        //
+        // });
     }
 }

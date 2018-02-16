@@ -5,7 +5,7 @@
         <h3>科目配置</h3>
         <div class="form_node">
           <label>课程 : </label>
-          <Input v-model="subject" placeholder="请输入课程" clearable style="width: 200px"/>
+          <Input v-model="newSubject" placeholder="请输入课程" clearable style="width: 200px"/>
           <Button id="saveSubject" @click="saveSubject">添加科目</Button>
         </div>
       </div>
@@ -18,9 +18,9 @@
           </Select>
         </div>
         <div class="form_node">
-          <label>课程 : </label>
-          <Select placeholder=" " v-model="course" style="width:200px">
-            <Option v-for="item in courseList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+          <label>科目 : </label>
+          <Select placeholder=" " v-model="subject" style="width:200px">
+            <Option v-for="item in subjectList" :value="item.id" :key="item.value">{{ item.name }}</Option>
           </Select>
         </div>
         <div class="form_node" style="width: 248px">
@@ -51,8 +51,8 @@
         </div>
       </div>
     </div>
-    <div style="margin-top: 30px">
-      <Table :loading="loading" border :columns="columns" :data="tableData"></Table>
+    <div style="margin-top: 30px;display: flex;justify-content: center">
+      <Table size="small" width="300" :loading="loading" border :columns="columns" :data="tableData"></Table>
     </div>
   </div>
 
@@ -65,7 +65,7 @@
     name:'',
     data(){
       return {
-        subject:'',
+        newSubject:'',
         schoolYear:'',
         schoolYearList:[
           {
@@ -93,21 +93,8 @@
             label: '2019学年第二学期'
           }
         ],
-        course:'',
-        courseList:[
-          {
-            value:'chinese',
-            label:'大学语文'
-          },
-          {
-            value:'math',
-            label:'大学数学'
-          },
-          {
-            value:'pe',
-            label:'大学体育'
-          }
-        ],
+        subject:'',
+        subjectList:[],
         weekday:'',
         weekdayList:[
           {
@@ -149,7 +136,7 @@
             key: 'id'
           },
           {
-            title: 'NAME',
+            title: '科目',
             key: 'name'
           }
         ],
@@ -157,28 +144,66 @@
       }
     },
     methods:{
-      saveSubject(){
-        console.log(this.subject)
-        console.log('--')
+      // 获取科目列表
+      getSubject(){
+        this.loading = true;
+        this.func.ajaxGet(this.api.subjectList, res => {
+          debugger;
+          this.tableData = res.data.subject;
+          this.subjectList = res.data.subject
+          this.loading = false;
+        });
       },
+
+      // 保存科目
+      saveSubject(){
+        console.log(this.newSubject)
+        console.log('--')
+        this.func.ajaxPost(this.api.subjectAdd,{
+          subject:this.newSubject
+        }, res => {
+          debugger;
+          this.newSubject = '';
+          this.getSubject()
+        });
+      },
+
+      // 保存课程
       saveCourse(){
         console.log(this.schoolYear)
-        console.log(this.course)
+        console.log(this.subject)
         console.log(this.weekday)
         console.log(this.classRoom)
         console.log(this.isSingleWeek)
         console.log(this.timeRange)
+      },
+
+      // 自动填写学期
+      getSchoolYear(){
+        var date = new Date();
+        var begin2017second = new Date('2018/03/03');
+        var end2017second = new Date('2018/07/10');
+        var begin2018first = new Date('2018/09/15');
+        var end2018first = new Date('2018/01/13');
+        var begin2018second = new Date('2019/03/03');
+        var end2018second = new Date('2019/07/10');
+
+        if(begin2017second < date <end2017second){
+          this.schoolYear = '2017学年第二学期'
+        }else if(begin2018first < date < end2018first){
+          this.schoolYear = '2018学年第一学期'
+        }else if(begin2018second < date <end2018second){
+          this.schoolYear = '2018学年第二学期'
+        }
       }
     },
     created(){
-      console.log('created')
       // 在进入页面的时候调用查询接口，获取当前已添加的科目
-      this.loading = true;
-      this.func.ajaxGet(this.api.subjectList, res => {
-        debugger;
-        this.tableData = res.data.subject;
-        this.loading = false;
-      });
+      this.getSubject();
+
+
+    },
+    computed:{
 
     },
     components:{
