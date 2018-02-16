@@ -33,18 +33,8 @@ module.exports = {
     rules: [
       {
         test: /\.vue$/,
-        use: [
-          {
-            loader: 'vue-loader',
-            options: vueLoaderConfig
-          },
-          {
-            loader: 'iview-loader',
-            options: {
-              prefix: true
-            }
-          }
-        ]
+        loader: 'vue-loader',
+        options: vueLoaderConfig
       },
       {
         test: /\.js$/,

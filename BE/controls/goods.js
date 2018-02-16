@@ -13,22 +13,18 @@ function formatData(rows) {
 
 module.exports = {
     // 获取商品列表
-    fetchAll (req, res) {
-        func.connPool(sql.queryAll, 'goods', rows => {
-            rows = formatData(rows);
-            res.json({code: 200, msg: 'ok', goods: rows});
-        });
+    fetchAll (req, res,next) {
+        let result = func.getList();
+        res.json({code: 200, message: 'ok', subject:result})
     },
 
     // 获取商品详情
     fetchById (req, res) {
         let id = req.body.id;
-
         func.connPool(sql.queryById, ['goods', id], rows => {
             rows = formatData(rows);
             res.json({code: 200, msg: 'ok', goods: rows[0]});
         });
-
     },
 
     // 添加|更新 商品

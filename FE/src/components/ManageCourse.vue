@@ -44,6 +44,7 @@
         <div class="form_node">
           <label>时间 : </label>
           <TimePicker :steps="[1, 5]" v-model="timeRange" hide-disabled-options :disabled-hours="[0,1,2,3,4,5,6,7,22,23]" format="HH:mm" type="timerange" placement="bottom-end" placeholder="课程的开始和结束时间"></TimePicker>
+
         </div>
         <div>
           <Button @click="saveCourse">添加课程</Button>
@@ -51,7 +52,7 @@
       </div>
     </div>
     <div style="margin-top: 30px">
-      <Table border :columns="columns" :data="data"></Table>
+      <Table :loading="loading" border :columns="columns" :data="tableData"></Table>
     </div>
   </div>
 
@@ -59,6 +60,7 @@
 
 <script>
   import { Input , Button , Table , Select , Option , TimePicker , Radio , RadioGroup} from 'iview'
+
   export default{
     name:'',
     data(){
@@ -140,100 +142,18 @@
         timeRange:'',
         classRoom:'',
         isSingleWeek:0,   // 0 : 普通课程 , 1 : 单周课程 , 2 : 双周课程,
-        data:[
-          {
-            name: 'John Brown',
-            age: 18,
-            address: 'New York No. 1 Lake Park'
-          },
-          {
-            name: 'Jim Green',
-            age: 24,
-            address: 'London No. 1 Lake Park'
-          },
-          {
-            name: 'Joe Black',
-            age: 30,
-            address: 'Sydney No. 1 Lake Park'
-          },
-          {
-            name: 'Jon Snow',
-            age: 26,
-            address: 'Ottawa No. 2 Lake Park'
-          }
-        ],
+        tableData:[],
         columns: [
           {
-            title: 'Name',
-            key: 'name',
-            render: (h, params) => {
-              return h('div', [
-                h('Icon', {
-                  props: {
-                    type: 'person'
-                  }
-                }),
-                h('strong', params.row.name)
-              ]);
-            }
+            title: 'ID',
+            key: 'id'
           },
           {
-            title: 'Age',
-            key: 'age'
-          },
-          {
-            title: 'Address',
-            key: 'address',
-            render: (h, params) => {
-              return h('div', [
-                h('Button', {
-                  style: {
-                    marginRight: '5px'
-                  },
-                  'class': {
-                    isButton: true
-                  },
-                  on: {
-                    click: () => {
-                      this.show(params.index)
-                    }
-                  }
-                }, 'View')
-              ]);
-            }
-          },
-          {
-            title: 'Action',
-            key: 'action',
-            width: 150,
-            align: 'center',
-            render: (h, params) => {
-              return h('div', [
-                h('Button', {
-                  style: {
-                    marginRight: '5px'
-                  },
-                  'class': {
-                    isButton: true
-                  },
-                  on: {
-                    click: () => {
-                      this.show(params.index)
-                    }
-                  }
-                }, 'View'),
-                h('Button', {
-
-                  on: {
-                    click: () => {
-                      this.remove(params.index)
-                    }
-                  }
-                }, 'Delete')
-              ]);
-            }
+            title: 'NAME',
+            key: 'name'
           }
-        ]
+        ],
+        loading:false
       }
     },
     methods:{
@@ -248,16 +168,18 @@
         console.log(this.classRoom)
         console.log(this.isSingleWeek)
         console.log(this.timeRange)
-      },
-      show (index) {
-        this.$Modal.info({
-          title: 'User Info',
-          content: `Name：${this.data[index].name}<br>Age：${this.data[index].age}<br>Address：${this.data[index].address}`
-        })
-      },
-      remove (index) {
-        this.data.splice(index, 1);
       }
+    },
+    created(){
+      console.log('created')
+      // 在进入页面的时候调用查询接口，获取当前已添加的科目
+      this.loading = true;
+      this.func.ajaxGet(this.api.subjectList, res => {
+        debugger;
+        this.tableData = res.data.subject;
+        this.loading = false;
+      });
+
     },
     components:{
       Input,

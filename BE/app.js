@@ -6,16 +6,25 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const index = require('./routes/index');
-const users = require('./routes/users');
-const sendUtil = require('./routes/sendMail');
-const router = require('./routes/router');
+const proxy = require('http-proxy-middleware');
+// const users = require('./routes/users');
+// const sendUtil = require('./routes/sendMail');
+const subjectRouter = require('./routes/router');
 var app = express();
+app.all('*', function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
+    res.header("X-Powered-By",' 3.2.1')
+    res.header("Content-Type", "application/json;charset=utf-8");
+    next();
+});
 
-app.use(cors({
-    origin:['http://localhost:8080'], // 允许这个域的访问
-    methods:['GET','POST'],
-    alloweHeaders:['Content-Type','Authorization']
-}))
+// app.use(cors({
+//     origin:['http://localhost:8080'], // 允许这个域的访问
+//     methods:['GET','POST'],
+//     alloweHeaders:['Content-Type','Authorization']
+// }))
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -30,9 +39,9 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
-app.use(router);
-app.use('/users', users);
-app.use('/sendMail', sendUtil);
+app.use(subjectRouter);
+// app.use('/users', users);
+// app.use('/sendMail', sendUtil);
 
 
 
