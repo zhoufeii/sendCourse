@@ -8,7 +8,7 @@ let api = require('../api');
 
 
 
-// goods
+// 科目
 subjectRouter.get(api.subjectList, function (req, res,next) {
     var connection = mysql.createConnection(db);
     var returnResult;
@@ -33,47 +33,88 @@ subjectRouter.get(api.subjectList, function (req, res,next) {
 
 });
 
+subjectRouter.post(api.subjectDetail, function (rqe,res,next) {
+    var  getSql = "SELECT `id` FROM `subject` WHERE `name` = ?";
+});
 
-subjectRouter.post(api.subjectDetail, goods.fetchById);
-// subjectRouter.post(api.subjectAdd, goods.addOne);
 subjectRouter.post(api.subjectAdd, function (req, res,next){
     // 添加 科目
     let subject = req.body.subject;
     let query, arr;
-
-    // // 新增
-    // query = 'INSERT INTO subject(name) VALUES(?)';
-    // arr = [name];
-
-
-    // func.connPool(query, arr, rows => {
-    //     res.send({code: 200, msg: 'done'});
-    //
-    // });
 
     var connection = mysql.createConnection(db);
     var returnResult;
     connection.connect();
 
     var  sql = 'INSERT INTO subject(name) VALUES(?)';
-    var addSubjectName = [subject]
-//增
-    connection.query(sql,addSubjectName,function (err, result) {
+    var  getSql = "SELECT `id` FROM `subject` WHERE `name` = ?";
+
+    var addSubjectName = [subject];
+
+    connection.query(getSql,addSubjectName,function (err, result) {
         if(err){
             console.log('[INSERT ERROR] - ',err.message);
-            return;
-        }
+            connection.query(sql,addSubjectName,function (err, result) {
+                if(err){
+                    console.log('[INSERT ERROR] - ',err.message);
+                    return;
+                }
 
-        console.log('--------------------------INSERT----------------------------');
-        //console.log('INSERT ID:',result.insertId);
-        console.log('INSERT ID:',result);
-        console.log('-----------------------------------------------------------------\n\n');
-        res.json({code: 200, message: 'done', id:result.insertId})
+                console.log('--------------------------INSERT----------------------------');
+                console.log('INSERT ID:',result);
+                console.log('-----------------------------------------------------------------');
+
+                res.json({code: 200, message: 'done', id:result.insertId})
+            });
+
+            connection.end();
+            return;
+        }else{
+            // 查到结果，重复
+            res.json({code: 200, message: '重复'})
+        }
     });
 
     connection.end();
 
-})
+});
+
+// 课程
+subjectRouter.post(api.courseAdd,function (req,res,next) {
+    // 添加课程
+    let subjectID = req.body.subject;
+    let semester = req.body.schoolYear;
+    let weekday = req.body.weekday;
+    let classRoom = req.body.classRoom;
+    let isSingleWeek = req.body.isSingleWeek;
+    let timeRange = req.body.timeRange;
+    let startTime = req.body.startTime;
+    let endTime = req.body.endTime;
+    let query, arr;
+
+    var connection = mysql.createConnection(db);
+    var returnResult;
+    connection.connect();
+
+    var sql = 'INSERT INTO course(subject_id,semester,weekday,start_time,end_time,classroom,is_single) VALUES(?,?,?,?,?,?,?)';
+
+    var addCourse = [subjectID,semester,weekday,startTime,endTime,classRoom,isSingleWeek];
+
+    connection.query(sql,addCourse,function (err, result) {
+        if(err) {
+            console.log('[INSERT ERROR] - ', err.message);
+            return;
+        }
+        console.log('--------------------------INSERT----------------------------');
+        console.log('INSERT ID:', result);
+        console.log('-----------------------------------------------------------------');
+
+        res.json({code: 200, message: 'done',result:result.insertId})
+
+    });
+
+    connection.end();
+});
 
 
 module.exports = subjectRouter;

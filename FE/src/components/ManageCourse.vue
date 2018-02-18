@@ -159,23 +159,75 @@
       saveSubject(){
         console.log(this.newSubject)
         console.log('--')
-        this.func.ajaxPost(this.api.subjectAdd,{
-          subject:this.newSubject
-        }, res => {
-          debugger;
-          this.newSubject = '';
-          this.getSubject()
-        });
+        if(this.newSubject.trim() !== ''){
+          this.func.ajaxPost(this.api.subjectAdd,{
+            subject:this.newSubject
+          }, res => {
+            debugger;
+            if(res.data.msg !== '重复'){
+              this.$Notice.warning({
+                title: '添加新科目',
+                desc: '此科目已存在'
+              });
+              return ;
+            }else{
+              this.newSubject = '';
+              this.getSubject()
+            }
+          });
+        }else{
+          this.$Notice.warning({
+            title: '添加新科目',
+            desc: '科目不可为空'
+          });
+        }
+
       },
 
       // 保存课程
       saveCourse(){
-        console.log(this.schoolYear)
-        console.log(this.subject)
-        console.log(this.weekday)
-        console.log(this.classRoom)
-        console.log(this.isSingleWeek)
-        console.log(this.timeRange)
+        console.log(this.schoolYear);
+        console.log(this.subject);
+        console.log(this.weekday);
+        console.log(this.classRoom);
+        console.log(this.isSingleWeek);
+        console.log(this.timeRange);
+        var a = this.timeRange[0];
+        let startTime = Number(this.timeRange[0])
+        let endTime = Number(this.timeRange[1])
+        debugger;
+        switch (this.isSingleWeek){
+          case '通用':
+            this.isSingleWeek = 0;
+            break;
+          case '单周':
+            this.isSingleWeek = 1;
+            break;
+          case '双周':
+            this.isSingleWeek = 2;
+            break;
+        }
+
+//        if(this.newSubject.trim() !== ''){
+          this.func.ajaxPost(this.api.courseAdd,{
+
+            subject:this.subject,
+            schoolYear:this.schoolYear,
+            weekday:this.weekday,
+            classRoom:this.classRoom,
+            isSingleWeek:this.isSingleWeek,
+            startTime:startTime,
+            endTime:endTime,
+
+          }, res => {
+            debugger;
+            console.log(res.data)
+            this.$Notice.success({
+              title:'添加课程',
+              desc:'课程添加成功'
+            })
+          });
+//        }
       },
 
       // 自动填写学期

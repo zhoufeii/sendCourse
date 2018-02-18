@@ -10,6 +10,7 @@ import iView from 'iview'
 import 'iview/dist/styles/iview.css'
 import api from "../../BE/api";
 import { Modal } from 'iview'
+import { Notice } from 'iview'
 
 Vue.config.productionTip = false;
 // Vue.use(iView);
@@ -17,6 +18,7 @@ Vue.prototype.func = func;
 Vue.prototype.api = api;
 Vue.prototype.axios = axios;
 Vue.prototype.$Modal = Modal;
+Vue.prototype.$Notice = Notice;
 
 
 
