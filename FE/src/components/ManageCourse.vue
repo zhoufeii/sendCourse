@@ -52,7 +52,7 @@
       </div>
     </div>
     <div style="margin-top: 30px;display: flex;justify-content: center">
-      <Table size="small" width="300" :loading="loading" border :columns="columns" :data="tableData"></Table>
+      <Table size="small" width="800" :loading="loading" border :columns="columns" :data="tableData"></Table>
     </div>
   </div>
 
@@ -60,6 +60,8 @@
 
 <script>
   import { Input , Button , Table , Select , Option , TimePicker , Radio , RadioGroup} from 'iview'
+  import util from '../../../BE/util/util'
+
 
   export default{
     name:'',
@@ -193,8 +195,10 @@
         console.log(this.isSingleWeek);
         console.log(this.timeRange);
         var a = this.timeRange[0];
-        let startTime = Number(this.timeRange[0])
-        let endTime = Number(this.timeRange[1])
+//        let startTime = this.timeRange[0].getHours() +':' + (this.timeRange[0].getMinutes()<10 ? '0'+this.timeRange[0].getMinutes() : this.timeRange[0].getMinutes());
+        let startTime = util.myFormatDate(this.timeRange[0].getHours(),this.timeRange[0].getMinutes());
+//        let endTime = this.timeRange[1].getHours() +':' + (this.timeRange[1].getMinutes()<10 ? '0'+this.timeRange[1].getMinutes() : this.timeRange[1].getMinutes());
+        let endTime = util.myFormatDate(this.timeRange[1].getHours(),this.timeRange[1].getMinutes());
         debugger;
         switch (this.isSingleWeek){
           case '通用':
@@ -241,17 +245,18 @@
         var end2018second = new Date('2019/07/10');
 
         if(begin2017second < date <end2017second){
-          this.schoolYear = '2017学年第二学期'
+          this.schoolYear = '201702'
         }else if(begin2018first < date < end2018first){
-          this.schoolYear = '2018学年第一学期'
+          this.schoolYear = '201801'
         }else if(begin2018second < date <end2018second){
-          this.schoolYear = '2018学年第二学期'
+          this.schoolYear = '201802'
         }
       }
     },
     created(){
       // 在进入页面的时候调用查询接口，获取当前已添加的科目
       this.getSubject();
+      this.getSchoolYear();
 
 
     },

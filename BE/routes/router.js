@@ -12,8 +12,11 @@ const nodemailer = require('nodemailer');
 const schedule = require("node-schedule");
 const SMSClient = require('@alicloud/sms-sdk')
 // ACCESS_KEY_ID/ACCESS_KEY_SECRET 根据实际申请的账号信息进行替换
-const accessKeyId = 'LTAI7G7rmVPofV8M'
-const secretAccessKey = 'k0H6cQeCm7hkG61uwvnqsqQI8bVowb';
+const accessKeyId = '**'
+const secretAccessKey = '**';
+const twoClassKey = 'SMS_125023595';
+const oneClassKey = 'SMS_125028639';
+const noClassKey = 'SMS_125028637';
 
 
 // 发送邮件和短信 api
@@ -55,6 +58,38 @@ var sendUtil = {
             });
         });
     },
+    sendMessageAPI:(TemplateCode,timeRange,weekday,resultArr)=>{
+        let smsClient = new SMSClient({accessKeyId, secretAccessKey});
+        let TemplateParam;
+        if(TemplateCode === 'SMS_125118443'){
+            // 一节课
+            console.log('一节课')
+            TemplateParam = '{"timeRange":"'+timeRange+'","weekday":"星期'+weekday+'","name1":"'+resultArr[0].name+'","address1":"'+resultArr[0].classroom+'","time1":"'+resultArr[0].start_time+" ~ "+''+resultArr[0].end_time+'"}';
+            console.log(TemplateParam)
+        }else if(TemplateCode === 'SMS_125023619'){
+            // 两节课
+            console.log('两节课')
+            TemplateParam = '{"timeRange":"'+timeRange+'","weekday":"星期'+weekday+'","name1":"'+resultArr[0].name+'","address1":"'+resultArr[0].classroom+'","time1":"'+resultArr[0].start_time+" ~ "+''+resultArr[0].end_time+'","name2":"'+resultArr[1].name+'","address2":"'+resultArr[1].classroom+'","time2":"'+resultArr[1].start_time+" ~ "+''+resultArr[1].end_time+'"}';
+        }else if(TemplateCode === 'SMS_125118464'){
+            // 没课
+            console.log('没课')
+            TemplateParam = '{"timeRange":"'+timeRange+'","weekday":"星期'+weekday+'"}';
+        }
+        smsClient.sendSMS({
+            PhoneNumbers: '18868412098',
+            SignName: '小曹课程管家',
+            TemplateCode: TemplateCode,
+            TemplateParam: TemplateParam
+        }).then(function (res) {
+            let {Code}=res;
+            if (Code === 'OK') {
+                //处理返回参数
+                console.log(res)
+            }
+        }, function (err) {
+            console.log(err)
+        })
+    },
     sendMessage:()=>{
 
         // 单双周
@@ -72,10 +107,6 @@ var sendUtil = {
         // 周几
         let weekday = (Number(today) - Number(new Date('2018/03/05')))/(1000*60*60*24)%7;
         weekday++;
-        // if(weekday === 0){
-        //     // 如果能被7 整除 ，则是星期一
-        //     weekday = 1
-        // }
 
         // 学期
         var date = new Date();
@@ -97,7 +128,30 @@ var sendUtil = {
         // console.log(isSingleWeek)
         // console.log(weekday)
         // console.log(semester)
-        var sql = "select c.*,s.* from course c,subject s where s.id = c.subject_id and c.weekday = "+weekday+" and c.is_single in (0,"+isSingleWeek+") and c.semester = "+semester+"";
+
+        var timeRangeHour = new Date().getHours();
+        var timeRange = '';
+        var sql = '';
+        if(timeRangeHour === 7){
+            // 早上7点发送的短信
+            timeRange = '早上';
+            sql = "select c.*,s.* from course c,subject s where s.id = c.subject_id and c.weekday = "+weekday+" and c.is_single in (0,"+isSingleWeek+") and c.semester = "+semester+" and c.start_time < '08:01'";
+        }else if(timeRangeHour === 12){
+            // 中午12点发送的短信
+            timeRange = '中午';
+            sql = "select c.*,s.* from course c,subject s where s.id = c.subject_id and c.weekday = "+weekday+" and c.is_single in (0,"+isSingleWeek+") and c.semester = "+semester+" and '11:35' < c.start_time and c.start_time < '13:31'";
+        }else if(timeRangeHour === 17){
+            // 下午5点发送的短信
+            timeRange = '下午';
+            sql = "select c.*,s.* from course c,subject s where s.id = c.subject_id and c.weekday = "+weekday+" and c.is_single in (0,"+isSingleWeek+") and c.semester = "+semester+" and c.start_time > '17:59'";
+        }else {
+            timeRange = '';
+            // sql = "select c.*,s.* from course c,subject s where s.id = c.subject_id and c.weekday = "+weekday+" and c.is_single in (0,"+isSingleWeek+") and c.semester = "+semester+"";
+            sql = "select c.*,s.* from course c,subject s where s.id = c.subject_id and c.weekday = "+weekday+" and c.is_single in (0,"+isSingleWeek+") and c.semester = "+semester+"";
+
+        }
+
+        // var sql = "select c.*,s.* from course c,subject s where s.id = c.subject_id and c.weekday = "+weekday+" and c.is_single in (0,"+isSingleWeek+") and c.semester = "+semester+" and c.start_time < 10:00";
         console.log(sql)
         var connection = mysql.createConnection(db);
         var returnResult;
@@ -111,68 +165,51 @@ var sendUtil = {
             console.log('--------------------------SELECT----------------------------');
             console.log(result);
             var resultContent = '';
-            for(let i = 0;i<result.length;i++){
-                console.log(result[i])
-                //let courseContent = `${result[i].name},在${result[i].classroom},${util.formatDate(Number(result[i].start_time))}~${util.formatDate(Number(result[i].start_time))}.`;
-                //resultContent += courseContent;
-            }
-            console.log(resultContent)
+            if(result.length>0){
+                // 有数据
 
-            console.log(result[0].name);
-            console.log(result[0].weekday);
-            console.log(result[0].classroom);
-            console.log(result[0].start_time);
-            console.log(result[0].end_time);
-            let weekday = result[0].weekday;
-            switch (weekday){
-                case 1:
-                    weekday = '一';
-                    break;
-                case 2:
-                    weekday = '二';
-                    break;
-                case 3:
-                    weekday = '三';
-                    break;
-                case 4:
-                    weekday = '四';
-                    break;
-                case 5:
-                    weekday = '五';
-                    break;
-                case 6:
-                    weekday = '六';
-                    break;
-                case 7:
-                    weekday = '天';
-                    break;
+                // 周几
+                let weekday = result[0].weekday;
+                weekday = util.switchWeekDay(weekday);
 
-            }
-            let startTime = util.formatDate(result[0].start_time);
-            let endTime = util.formatDate(result[0].end_time);
-            console.log('------------------------------------------------------------\n\n');
-            returnResult = result;
-            // result.json({code: 200, message: 'ok', course:returnResult})
-            //初始化sms_client
-            let smsClient = new SMSClient({accessKeyId, secretAccessKey})
-            //发送短信
-            smsClient.sendSMS({
-                PhoneNumbers: '18868412098',
-                SignName: '小曹课程管家',
-                TemplateCode: 'SMS_123669090',
-                // TemplateCode: 'SMS_125118316',    新的
-                // TemplateParam: '{"weekday":"星期'+weekday+'","course":"'+resultContent+'"}'
-                // TemplateParam: '{"weekday":"星期'+weekday+'","course1":"大学语文","classroom1":"K2-201","startTime1":"10:00","endTime1":"12:00",}'
-                TemplateParam: '{"weekday":"星期'+weekday+'","course":"大学语文，K2-201"}'
-            }).then(function (res) {
-                let {Code}=res;
-                if (Code === 'OK') {
-                    //处理返回参数
-                    console.log(res)
+                if(result.length === 2){
+                    // 两节课
+                    sendUtil.sendMessageAPI('SMS_125023619',timeRange,weekday,result)
+                }else{
+                    // 一节课
+                    sendUtil.sendMessageAPI('SMS_125118443',timeRange,weekday,result)
                 }
-            }, function (err) {
-                console.log(err)
-            })
+                // for(let i = 0;i<result.length;i++){
+                //     console.log(result[i])
+                //     //let courseContent = `${result[i].name},在${result[i].classroom},${util.formatDate(Number(result[i].start_time))}~${util.formatDate(Number(result[i].start_time))}.`;
+                //     //resultContent += courseContent;
+                // }
+                // console.log(resultContent)
+                //
+                // console.log(result);
+                // console.log(result[0].name);
+                // console.log(result[0].weekday);
+                // console.log(result[0].classroom);
+                // console.log(result[0].start_time);
+                // console.log(result[0].end_time);
+                //
+                // let startTime =result[0].start_time;
+                // let endTime = result[0].end_time;
+                // console.log('------------------------------------------------------------\n\n');
+                // returnResult = result;
+                // // result.json({code: 200, message: 'ok', course:returnResult})
+
+            }else{
+                //没数据
+
+                // 获取当前周几
+                let weekday = new Date().getDay();
+                weekday = util.switchWeekDay(weekday);
+                //发送短信
+                sendUtil.sendMessageAPI('SMS_125118464',timeRange,weekday);
+                return;
+            }
+
         });
 
         connection.end();
@@ -183,8 +220,11 @@ var sendUtil = {
 
 var rule = new schedule.RecurrenceRule();
 
-var time = [7,12,17];
-rule.hour = time;
+var time = [5,15,25,35,45,55];
+rule.minute = time;
+// var time = [7,12,18];
+// rule.hour = time;
+// rule.minute = 0;
 
 schedule.scheduleJob(rule, function(){
 
@@ -192,7 +232,7 @@ schedule.scheduleJob(rule, function(){
     sendUtil.sendMessage()
 
 });
-sendUtil.sendMessage()
+// sendUtil.sendMessage()
 // 科目
 
 // 获取科目

@@ -9,6 +9,7 @@ import store from './store/store'
 import iView from 'iview'
 import 'iview/dist/styles/iview.css'
 import api from "../../BE/api";
+import util from '../../BE/util/util'
 import { Modal } from 'iview'
 import { Notice } from 'iview'
 
