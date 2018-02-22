@@ -166,13 +166,17 @@
             subject:this.newSubject
           }, res => {
             debugger;
-            if(res.data.msg !== '重复'){
+            if(res.data.message === '重复'){
               this.$Notice.warning({
                 title: '添加新科目',
                 desc: '此科目已存在'
               });
               return ;
             }else{
+              this.$Notice.success({
+                title: '添加新科目',
+                desc: '添加成功'
+              });
               this.newSubject = '';
               this.getSubject()
             }

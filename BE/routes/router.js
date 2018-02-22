@@ -12,8 +12,8 @@ const nodemailer = require('nodemailer');
 const schedule = require("node-schedule");
 const SMSClient = require('@alicloud/sms-sdk')
 // ACCESS_KEY_ID/ACCESS_KEY_SECRET 根据实际申请的账号信息进行替换
-const accessKeyId = '**'
-const secretAccessKey = '**';
+const accessKeyId = 'LTAI7G7rmVPofV8M'
+const secretAccessKey = 'k0H6cQeCm7hkG61uwvnqsqQI8bVowb';
 const twoClassKey = 'SMS_125023595';
 const oneClassKey = 'SMS_125028639';
 const noClassKey = 'SMS_125028637';
@@ -134,13 +134,14 @@ var sendUtil = {
         var sql = '';
         if(timeRangeHour === 7){
             // 早上7点发送的短信
+            console.log(timeRangeHour)
             timeRange = '早上';
-            sql = "select c.*,s.* from course c,subject s where s.id = c.subject_id and c.weekday = "+weekday+" and c.is_single in (0,"+isSingleWeek+") and c.semester = "+semester+" and c.start_time < '08:01'";
+            sql = "select c.*,s.* from course c,subject s where s.id = c.subject_id and c.weekday = "+weekday+" and c.is_single in (0,"+isSingleWeek+") and c.semester = "+semester+" and c.start_time < '11:01'";
         }else if(timeRangeHour === 12){
             // 中午12点发送的短信
             timeRange = '中午';
             sql = "select c.*,s.* from course c,subject s where s.id = c.subject_id and c.weekday = "+weekday+" and c.is_single in (0,"+isSingleWeek+") and c.semester = "+semester+" and '11:35' < c.start_time and c.start_time < '13:31'";
-        }else if(timeRangeHour === 17){
+        }else if(timeRangeHour === 20){
             // 下午5点发送的短信
             timeRange = '下午';
             sql = "select c.*,s.* from course c,subject s where s.id = c.subject_id and c.weekday = "+weekday+" and c.is_single in (0,"+isSingleWeek+") and c.semester = "+semester+" and c.start_time > '17:59'";
@@ -203,7 +204,7 @@ var sendUtil = {
                 //没数据
 
                 // 获取当前周几
-                let weekday = new Date().getDay();
+                // let weekday = new Date().getDay();
                 weekday = util.switchWeekDay(weekday);
                 //发送短信
                 sendUtil.sendMessageAPI('SMS_125118464',timeRange,weekday);
@@ -220,19 +221,19 @@ var sendUtil = {
 
 var rule = new schedule.RecurrenceRule();
 
-var time = [5,15,25,35,45,55];
-rule.minute = time;
-// var time = [7,12,18];
-// rule.hour = time;
-// rule.minute = 0;
+// var time = [5,15,25,35,45,55];
+// rule.minute = time;
+var time = [7,12,17];
+rule.hour = time;
+rule.minute = 0;
 
 schedule.scheduleJob(rule, function(){
 
     console.log("执行任务");
-    sendUtil.sendMessage()
+    // sendUtil.sendMessage()
 
 });
-// sendUtil.sendMessage()
+sendUtil.sendMessage()
 // 科目
 
 // 获取科目
@@ -268,7 +269,7 @@ subjectRouter.post(api.subjectAdd, function (req, res,next){
     // 添加 科目
     let subject = req.body.subject;
     let query, arr;
-
+debugger;
     var connection = mysql.createConnection(db);
     var returnResult;
     connection.connect();
@@ -279,8 +280,9 @@ subjectRouter.post(api.subjectAdd, function (req, res,next){
     var addSubjectName = [subject];
 
     connection.query(getSql,addSubjectName,function (err, result) {
-        if(err){
-            console.log('[INSERT ERROR] - ',err.message);
+        console.log(result)
+        if(result.length === 0){
+            console.log('没有重复')
             connection.query(sql,addSubjectName,function (err, result) {
                 if(err){
                     console.log('[INSERT ERROR] - ',err.message);
@@ -294,15 +296,16 @@ subjectRouter.post(api.subjectAdd, function (req, res,next){
                 res.json({code: 200, message: 'done', id:result.insertId})
             });
 
-            connection.end();
+            // connection.end();
             return;
         }else{
             // 查到结果，重复
+            console.log('没有重复')
             res.json({code: 200, message: '重复'})
         }
     });
 
-    connection.end();
+    // connection.end();
 
 });
 
