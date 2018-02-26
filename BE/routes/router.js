@@ -61,12 +61,12 @@ var sendUtil = {
     sendMessageAPI:(TemplateCode,timeRange,weekday,resultArr)=>{
         let smsClient = new SMSClient({accessKeyId, secretAccessKey});
         let TemplateParam;
-        if(TemplateCode === 'SMS_125118443'){
+        if(TemplateCode === 'SMS_125119434'){
             // 一节课
             console.log('一节课')
-            TemplateParam = '{"timeRange":"'+timeRange+'","weekday":"星期'+weekday+'","name1":"'+resultArr[0].name+'","address1":"'+resultArr[0].classroom+'","time1":"'+resultArr[0].start_time+" ~ "+''+resultArr[0].end_time+'"}';
+            TemplateParam = '{"timeRange":"'+timeRange+'","weekday":"星期'+weekday+'","name":"'+resultArr[0].name+'","address":"'+resultArr[0].classroom+'","time":"'+resultArr[0].start_time+" ~ "+''+resultArr[0].end_time+'"}';
             console.log(TemplateParam)
-        }else if(TemplateCode === 'SMS_125023619'){
+        }else if(TemplateCode === 'SMS_125119436'){
             // 两节课
             console.log('两节课')
             TemplateParam = '{"timeRange":"'+timeRange+'","weekday":"星期'+weekday+'","name1":"'+resultArr[0].name+'","address1":"'+resultArr[0].classroom+'","time1":"'+resultArr[0].start_time+" ~ "+''+resultArr[0].end_time+'","name2":"'+resultArr[1].name+'","address2":"'+resultArr[1].classroom+'","time2":"'+resultArr[1].start_time+" ~ "+''+resultArr[1].end_time+'"}';
@@ -141,7 +141,7 @@ var sendUtil = {
             // 中午12点发送的短信
             timeRange = '中午';
             sql = "select c.*,s.* from course c,subject s where s.id = c.subject_id and c.weekday = "+weekday+" and c.is_single in (0,"+isSingleWeek+") and c.semester = "+semester+" and '11:35' < c.start_time and c.start_time < '13:31'";
-        }else if(timeRangeHour === 20){
+        }else if(timeRangeHour === 17){
             // 下午5点发送的短信
             timeRange = '下午';
             sql = "select c.*,s.* from course c,subject s where s.id = c.subject_id and c.weekday = "+weekday+" and c.is_single in (0,"+isSingleWeek+") and c.semester = "+semester+" and c.start_time > '17:59'";
@@ -175,10 +175,10 @@ var sendUtil = {
 
                 if(result.length === 2){
                     // 两节课
-                    sendUtil.sendMessageAPI('SMS_125023619',timeRange,weekday,result)
+                    sendUtil.sendMessageAPI('SMS_125119436',timeRange,weekday,result)
                 }else{
                     // 一节课
-                    sendUtil.sendMessageAPI('SMS_125118443',timeRange,weekday,result)
+                    sendUtil.sendMessageAPI('SMS_125119434',timeRange,weekday,result)
                 }
                 // for(let i = 0;i<result.length;i++){
                 //     console.log(result[i])
@@ -205,6 +205,7 @@ var sendUtil = {
 
                 // 获取当前周几
                 // let weekday = new Date().getDay();
+                console.log('没数据的weekday'+weekday)
                 weekday = util.switchWeekDay(weekday);
                 //发送短信
                 sendUtil.sendMessageAPI('SMS_125118464',timeRange,weekday);
@@ -221,19 +222,19 @@ var sendUtil = {
 
 var rule = new schedule.RecurrenceRule();
 
-// var time = [5,15,25,35,45,55];
-// rule.minute = time;
-var time = [7,12,17];
-rule.hour = time;
-rule.minute = 0;
+var time = [5,15,25,35,45,55];
+rule.minute = time;
+// var time = [7,12,17];
+// rule.hour = time;
+// rule.minute = 0;
 
 schedule.scheduleJob(rule, function(){
 
     console.log("执行任务");
-    // sendUtil.sendMessage()
+    sendUtil.sendMessage()
 
 });
-sendUtil.sendMessage()
+// sendUtil.sendMessage()
 // 科目
 
 // 获取科目

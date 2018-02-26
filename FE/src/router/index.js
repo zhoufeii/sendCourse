@@ -6,6 +6,7 @@ import Apple from '@/components/Apple'
 import Banana from '@/components/Banana'
 import ManageCourse from '@/components/ManageCourse'
 import TableDemo from '@/components/TableDemo'
+import SleepingBeauty from '@/components/SleepingBeauty'
 
 Vue.use(Router)
 
@@ -17,9 +18,12 @@ export default new Router({
     //   redirect:'/course'     // 重定向
     // },
     {
+      // path: '/',
+      // name: 'SleepingBeauty',
+      // component: SleepingBeauty,
       path: '/',
-      name: 'HelloWorld',
-      component: HelloWorld,
+      name: 'ManageCourse',
+      component: ManageCourse,
 
     },
     // {
