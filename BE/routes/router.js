@@ -12,8 +12,8 @@ const nodemailer = require('nodemailer');
 const schedule = require("node-schedule");
 const SMSClient = require('@alicloud/sms-sdk')
 // ACCESS_KEY_ID/ACCESS_KEY_SECRET 根据实际申请的账号信息进行替换
-const accessKeyId = 'LTAI7G7rmVPofV8M'
-const secretAccessKey = 'k0H6cQeCm7hkG61uwvnqsqQI8bVowb';
+const accessKeyId = '*'
+const secretAccessKey = '*';
 const twoClassKey = 'SMS_125023595';
 const oneClassKey = 'SMS_125028639';
 const noClassKey = 'SMS_125028637';
@@ -230,10 +230,10 @@ rule.minute = time;
 schedule.scheduleJob(rule, function(){
 
     console.log("执行任务");
-    sendUtil.sendMessage()
+    // sendUtil.sendMessage()
 
 });
-// sendUtil.sendMessage()
+ sendUtil.sendMessage()
 // 科目
 
 // 获取科目
@@ -321,7 +321,7 @@ subjectRouter.post(api.courseAdd,function (req,res,next) {
     let timeRange = req.body.timeRange;
     let startTime = req.body.startTime;
     let endTime = req.body.endTime;
-    let startWeek = req.body.startWeek;
+    let beginWeek = req.body.beginWeek;
     let endWeek = req.body.endWeek;
     let query, arr;
 
@@ -331,7 +331,7 @@ subjectRouter.post(api.courseAdd,function (req,res,next) {
 
     var sql = 'INSERT INTO course(subject_id,semester,weekday,start_time,end_time,classroom,is_single,begin_week,end_week) VALUES(?,?,?,?,?,?,?,?,?)';
 
-    var addCourse = [subjectID,semester,weekday,startTime,endTime,classRoom,isSingleWeek,startWeek,endWeek];
+    var addCourse = [subjectID,semester,weekday,startTime,endTime,classRoom,isSingleWeek,beginWeek,endWeek];
 
     connection.query(sql,addCourse,function (err, result) {
         if(err) {
