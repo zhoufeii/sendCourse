@@ -37,6 +37,7 @@
             <Option v-for="item in weekdayList" :value="item.value" :key="item.value">{{ item.label }}</Option>
           </Select>
         </div>
+
         <div class="form_node">
           <label>教室 : </label>
           <Input v-model="classRoom" placeholder="请输入教室" clearable style="width: 200px"/>
@@ -44,7 +45,18 @@
         <div class="form_node">
           <label>时间 : </label>
           <TimePicker :steps="[1, 5]" v-model="timeRange" hide-disabled-options :disabled-hours="[0,1,2,3,4,5,6,7,22,23]" format="HH:mm" type="timerange" placement="bottom-end" placeholder="课程的开始和结束时间"></TimePicker>
-
+        </div>
+        <div class="form_node">
+          <label>开始周 : </label>
+          <Select placeholder=" " v-model="beginWeek" style="width:200px">
+            <Option v-for="item in weeks" :value="item" :key="item">{{ item }}</Option>
+          </Select>
+        </div>
+        <div class="form_node">
+          <label>结束周 : </label>
+          <Select placeholder=" " v-model="endWeek" style="width:200px">
+            <Option v-for="item in weeks" :value="item" :key="item">{{ item }}</Option>
+          </Select>
         </div>
         <div>
           <Button @click="saveCourse">添加课程</Button>
@@ -128,6 +140,9 @@
             label:'星期日'
           },
         ],
+        beginWeek:'',
+        endWeek:'',
+        weeks:[],
         timeRange:'',
         classRoom:'',
         isSingleWeek:0,   // 0 : 普通课程 , 1 : 单周课程 , 2 : 双周课程,
@@ -198,7 +213,8 @@
         console.log(this.classRoom);
         console.log(this.isSingleWeek);
         console.log(this.timeRange);
-        var a = this.timeRange[0];
+        console.log(this.beginWeek);
+        console.log(this.endWeek);
 //        let startTime = this.timeRange[0].getHours() +':' + (this.timeRange[0].getMinutes()<10 ? '0'+this.timeRange[0].getMinutes() : this.timeRange[0].getMinutes());
         let startTime = util.myFormatDate(this.timeRange[0].getHours(),this.timeRange[0].getMinutes());
 //        let endTime = this.timeRange[1].getHours() +':' + (this.timeRange[1].getMinutes()<10 ? '0'+this.timeRange[1].getMinutes() : this.timeRange[1].getMinutes());
@@ -226,6 +242,8 @@
             isSingleWeek:this.isSingleWeek,
             startTime:startTime,
             endTime:endTime,
+            beginWeek:this.beginWeek,
+            endWeek:this.endWeek,
 
           }, res => {
             debugger;
@@ -255,13 +273,20 @@
         }else if(begin2018second < date <end2018second){
           this.schoolYear = '201802'
         }
+      },
+
+      // 遍历这个学期的周数
+      getWeeks(weeks){
+        for(let i = 1;i<weeks+1;i++){
+          this.weeks.push(i);
+        }
       }
     },
     created(){
       // 在进入页面的时候调用查询接口，获取当前已添加的科目
       this.getSubject();
       this.getSchoolYear();
-
+      this.getWeeks(17)
 
     },
     computed:{

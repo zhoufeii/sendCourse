@@ -94,8 +94,9 @@ var sendUtil = {
 
         // 单双周
         let today = new Date('2018/03/06');
-        let isSingleWeek = Math.floor((Number(today) - Number(new Date('2018/03/05')))/(1000*60*60*24)/7);
-        if(isSingleWeek%2){
+        let whichWeek = Math.floor((Number(today) - Number(new Date('2018/03/05')))/(1000*60*60*24)/7);
+        let isSingleWeek = 1;
+        if(whichWeek%2){
             // 双周
             isSingleWeek = 2;
         }else{
@@ -132,27 +133,25 @@ var sendUtil = {
         var timeRangeHour = new Date().getHours();
         var timeRange = '';
         var sql = '';
+
         if(timeRangeHour === 7){
             // 早上7点发送的短信
             console.log(timeRangeHour)
             timeRange = '早上';
-            sql = "select c.*,s.* from course c,subject s where s.id = c.subject_id and c.weekday = "+weekday+" and c.is_single in (0,"+isSingleWeek+") and c.semester = "+semester+" and c.start_time < '11:01'";
+            sql = "select c.*,s.* from course c,subject s where s.id = c.subject_id and c.weekday = "+weekday+" and c.is_single in (0,"+isSingleWeek+") and c.semester = "+semester+" and c.start_time < '11:01' and begin_week <= "+(Number(whichWeek)+1)+" and end_week >= "+(Number(whichWeek)+1)+"";
         }else if(timeRangeHour === 12){
             // 中午12点发送的短信
             timeRange = '中午';
-            sql = "select c.*,s.* from course c,subject s where s.id = c.subject_id and c.weekday = "+weekday+" and c.is_single in (0,"+isSingleWeek+") and c.semester = "+semester+" and '11:35' < c.start_time and c.start_time < '13:31'";
+            sql = "select c.*,s.* from course c,subject s where s.id = c.subject_id and c.weekday = "+weekday+" and c.is_single in (0,"+isSingleWeek+") and c.semester = "+semester+" and '11:35' < c.start_time and c.start_time < '17:50' and begin_week <= "+(Number(whichWeek)+1)+" and end_week >= "+(Number(whichWeek)+1)+"";
         }else if(timeRangeHour === 17){
             // 下午5点发送的短信
             timeRange = '下午';
-            sql = "select c.*,s.* from course c,subject s where s.id = c.subject_id and c.weekday = "+weekday+" and c.is_single in (0,"+isSingleWeek+") and c.semester = "+semester+" and c.start_time > '17:59'";
+            sql = "select c.*,s.* from course c,subject s where s.id = c.subject_id and c.weekday = "+weekday+" and c.is_single in (0,"+isSingleWeek+") and c.semester = "+semester+" and c.start_time > '17:59' and begin_week <= "+(Number(whichWeek)+1)+" and end_week >= "+(Number(whichWeek)+1)+"";
         }else {
             timeRange = '';
-            // sql = "select c.*,s.* from course c,subject s where s.id = c.subject_id and c.weekday = "+weekday+" and c.is_single in (0,"+isSingleWeek+") and c.semester = "+semester+"";
-            sql = "select c.*,s.* from course c,subject s where s.id = c.subject_id and c.weekday = "+weekday+" and c.is_single in (0,"+isSingleWeek+") and c.semester = "+semester+"";
+            sql = "select c.*,s.* from course c,subject s where s.id = c.subject_id and c.weekday = "+weekday+" and c.is_single in (0,"+isSingleWeek+") and c.semester = "+semester+" and begin_week <= "+(Number(whichWeek)+1)+" and end_week >= "+(Number(whichWeek)+1)+"";
 
         }
-
-        // var sql = "select c.*,s.* from course c,subject s where s.id = c.subject_id and c.weekday = "+weekday+" and c.is_single in (0,"+isSingleWeek+") and c.semester = "+semester+" and c.start_time < 10:00";
         console.log(sql)
         var connection = mysql.createConnection(db);
         var returnResult;
@@ -322,15 +321,17 @@ subjectRouter.post(api.courseAdd,function (req,res,next) {
     let timeRange = req.body.timeRange;
     let startTime = req.body.startTime;
     let endTime = req.body.endTime;
+    let startWeek = req.body.startWeek;
+    let endWeek = req.body.endWeek;
     let query, arr;
 
     var connection = mysql.createConnection(db);
     var returnResult;
     connection.connect();
 
-    var sql = 'INSERT INTO course(subject_id,semester,weekday,start_time,end_time,classroom,is_single) VALUES(?,?,?,?,?,?,?)';
+    var sql = 'INSERT INTO course(subject_id,semester,weekday,start_time,end_time,classroom,is_single,begin_week,end_week) VALUES(?,?,?,?,?,?,?,?,?)';
 
-    var addCourse = [subjectID,semester,weekday,startTime,endTime,classRoom,isSingleWeek];
+    var addCourse = [subjectID,semester,weekday,startTime,endTime,classRoom,isSingleWeek,startWeek,endWeek];
 
     connection.query(sql,addCourse,function (err, result) {
         if(err) {
