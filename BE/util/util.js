@@ -3,7 +3,7 @@ module.exports = {
     add0(m){
         return m<10?'0'+m:m;
     },
-    formatDate(needTime){
+    formatTime(needTime){
         //needTime是整数，否则要parseInt转换
         var time = new Date(needTime);
         // var y = time.getFullYear();
@@ -13,6 +13,14 @@ module.exports = {
         var mm = time.getMinutes();
         // var s = time.getSeconds();
         return this.add0(h)+':'+this.add0(mm);
+    },
+    formatDate(){
+        var time = new Date();
+        var y = time.getFullYear();
+        var m = time.getMonth()+1;
+        var d = time.getDate();
+
+        return y+'/'+this.add0(m)+'/'+this.add0(d);
     },
     myFormatDate(hour,minute){
         hour = hour < 10 ? '0'+hour : hour;

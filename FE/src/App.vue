@@ -6,7 +6,6 @@
     <Content>
       <RealContent></RealContent>
     </Content>
-    <Footer class="footer"></Footer>
   </div>
 </template>
 

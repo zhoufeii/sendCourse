@@ -12,8 +12,8 @@ const nodemailer = require('nodemailer');
 const schedule = require("node-schedule");
 const SMSClient = require('@alicloud/sms-sdk')
 // ACCESS_KEY_ID/ACCESS_KEY_SECRET 根据实际申请的账号信息进行替换
-const accessKeyId = '*'
-const secretAccessKey = '*';
+const accessKeyId = 'LTAI7G7rmVPofV8M'
+const secretAccessKey = 'k0H6cQeCm7hkG61uwvnqsqQI8bVowb';
 const twoClassKey = 'SMS_125023595';
 const oneClassKey = 'SMS_125028639';
 const noClassKey = 'SMS_125028637';
@@ -76,7 +76,7 @@ var sendUtil = {
             TemplateParam = '{"timeRange":"'+timeRange+'","weekday":"星期'+weekday+'"}';
         }
         smsClient.sendSMS({
-            PhoneNumbers: '18868412098',
+            PhoneNumbers: '13372416792',
             SignName: '小曹课程管家',
             TemplateCode: TemplateCode,
             TemplateParam: TemplateParam
@@ -93,8 +93,9 @@ var sendUtil = {
     sendMessage:()=>{
 
         // 单双周
-        let today = new Date('2018/03/06');
-        let whichWeek = Math.floor((Number(today) - Number(new Date('2018/03/05')))/(1000*60*60*24)/7);
+        let today = new Date(util.formatDate());
+        let whichWeek = Math.floor((Number(today) - Number(new Date('2018/03/05')))/(1000*60*60*24)/7); // 0表示第一周
+        // whichWeek = 5;
         let isSingleWeek = 1;
         if(whichWeek%2){
             // 双周
@@ -133,7 +134,7 @@ var sendUtil = {
         var timeRangeHour = new Date().getHours();
         var timeRange = '';
         var sql = '';
-
+        // timeRangeHour = 7;
         if(timeRangeHour === 7){
             // 早上7点发送的短信
             console.log(timeRangeHour)
@@ -174,6 +175,12 @@ var sendUtil = {
 
                 if(result.length === 2){
                     // 两节课
+                    if(result[0].start_time > result[1].start_time){
+                        // 顺序颠倒
+                        let lastResult = result[0];
+                        result[0] = result[1];
+                        result[1] = lastResult;
+                    }
                     sendUtil.sendMessageAPI('SMS_125119436',timeRange,weekday,result)
                 }else{
                     // 一节课
@@ -181,7 +188,7 @@ var sendUtil = {
                 }
                 // for(let i = 0;i<result.length;i++){
                 //     console.log(result[i])
-                //     //let courseContent = `${result[i].name},在${result[i].classroom},${util.formatDate(Number(result[i].start_time))}~${util.formatDate(Number(result[i].start_time))}.`;
+                //     //let courseContent = `${result[i].name},在${result[i].classroom},${util.formatTime(Number(result[i].start_time))}~${util.formatTime(Number(result[i].start_time))}.`;
                 //     //resultContent += courseContent;
                 // }
                 // console.log(resultContent)
@@ -221,8 +228,8 @@ var sendUtil = {
 
 var rule = new schedule.RecurrenceRule();
 
-var time = [5,15,25,35,45,55];
-rule.minute = time;
+// var time = [5,15,25,35,45,55];
+// rule.minute = time;
 // var time = [7,12,17];
 // rule.hour = time;
 // rule.minute = 0;
