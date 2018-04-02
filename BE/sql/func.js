@@ -69,7 +69,7 @@ module.exports = {
         connection.end();
     },
     addSubject(req, res){
-        // 添加|更新 商品
+        // 添加
         console.log(req)
         console.log('------------')
         console.log(res)
@@ -81,7 +81,7 @@ module.exports = {
 
         if (id) {
             // 更新
-            query = 'UPDATE goods SET name=? WHERE id=?';
+            query = 'UPDATE subject SET name=? WHERE id=?';
             arr = [name, id];
         } else {
             // 新增

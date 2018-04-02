@@ -12,8 +12,9 @@ const nodemailer = require('nodemailer');
 const schedule = require("node-schedule");
 const SMSClient = require('@alicloud/sms-sdk')
 // ACCESS_KEY_ID/ACCESS_KEY_SECRET 根据实际申请的账号信息进行替换
-const accessKeyId = 'LTAI7G7rmVPofV8M'
-const secretAccessKey = 'k0H6cQeCm7hkG61uwvnqsqQI8bVowb';
+const accessKeyId = '*';
+const secretAccessKey = '*';
+
 const twoClassKey = 'SMS_125023595';
 const oneClassKey = 'SMS_125028639';
 const noClassKey = 'SMS_125028637';
@@ -101,7 +102,6 @@ var sendUtil = {
             // 双周
             isSingleWeek = 2;
         }else{
-
             // 单周
             isSingleWeek = 1;
         }
@@ -150,7 +150,7 @@ var sendUtil = {
             sql = "select c.*,s.* from course c,subject s where s.id = c.subject_id and c.weekday = "+weekday+" and c.is_single in (0,"+isSingleWeek+") and c.semester = "+semester+" and c.start_time > '17:59' and begin_week <= "+(Number(whichWeek)+1)+" and end_week >= "+(Number(whichWeek)+1)+"";
         }else {
             timeRange = '';
-            sql = "select c.*,s.* from course c,subject s where s.id = c.subject_id and c.weekday = "+weekday+" and c.is_single in (0,"+isSingleWeek+") and c.semester = "+semester+" and begin_week <= "+(Number(whichWeek)+1)+" and end_week >= "+(Number(whichWeek)+1)+"";
+            sql = "select c.*,s.* from course c,subject s where s.id = c.subject_id and c.weekday = "+weekday+" and c.is_single in (0,"+isSingleWeek+") and c.semester = "+semester+" and c.start_time < '11:01' and begin_week <= "+(Number(whichWeek)+1)+" and end_week >= "+(Number(whichWeek)+1)+"";
 
         }
         console.log(sql)
@@ -228,8 +228,8 @@ var sendUtil = {
 
 var rule = new schedule.RecurrenceRule();
 
-// var time = [5,15,25,35,45,55];
-// rule.minute = time;
+var time = [5,15,25,35,45,55];
+rule.minute = time;
 // var time = [7,12,17];
 // rule.hour = time;
 // rule.minute = 0;
@@ -237,10 +237,10 @@ var rule = new schedule.RecurrenceRule();
 schedule.scheduleJob(rule, function(){
 
     console.log("执行任务");
-    // sendUtil.sendMessage()
+    sendUtil.sendMessage()
 
 });
- sendUtil.sendMessage()
+ // sendUtil.sendMessage()
 // 科目
 
 // 获取科目
