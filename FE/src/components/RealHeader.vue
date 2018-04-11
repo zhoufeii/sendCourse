@@ -30,11 +30,16 @@
       </MenuGroup>
     </Submenu>
     <MenuItem name="4">
-      <router-link :to="{path:'/manageCourse'}" tag="span">
+      <router-link :to="{path:'/AddSubjectOrCourse'}" tag="span">
+        <Icon type="settings"></Icon>
+        添加科目和课程
+      </router-link>
+    </MenuItem>
+    <MenuItem name="5">
+      <router-link :to="{path:'/ManageCourse'}" tag="span">
         <Icon type="settings"></Icon>
         课程配置
       </router-link>
-
     </MenuItem>
   </Menu>
 </template>

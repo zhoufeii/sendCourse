@@ -5,6 +5,7 @@ import Course from '@/components/Course'
 import Apple from '@/components/Apple'
 import Banana from '@/components/Banana'
 import ManageCourse from '@/components/ManageCourse'
+import AddSubjectOrCourse from '@/components/AddSubjectOrCourse'
 import TableDemo from '@/components/TableDemo'
 import SleepingBeauty from '@/components/SleepingBeauty'
 
@@ -21,9 +22,9 @@ export default new Router({
       // path: '/',
       // name: 'SleepingBeauty',
       // component: SleepingBeauty,
-      path: '/',
-      name: 'ManageCourse',
-      component: ManageCourse,
+      path: '/AddSubjectOrCourse',
+      name: 'AddSubjectOrCourse',
+      component: AddSubjectOrCourse,
 
     },
     // {
