@@ -29,11 +29,7 @@ export default {
   },
   methods:{
     getCourse(course){
-      console.log(course)
-      console.log('----------')
-      console.log(this.courseCom)
       this.courseCom = course;
-      console.log(this.courseCom)
     }
   }
 }

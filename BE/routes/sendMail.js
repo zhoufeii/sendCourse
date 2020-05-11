@@ -5,8 +5,8 @@ const nodemailer = require('nodemailer');
 const schedule = require("node-schedule");
 const SMSClient = require('@alicloud/sms-sdk')
 // ACCESS_KEY_ID/ACCESS_KEY_SECRET 根据实际申请的账号信息进行替换
-const accessKeyId = 'LTAI7G7rmVPofV8M'
-const secretAccessKey = 'k0H6cQeCm7hkG61uwvnqsqQI8bVowb'
+const accessKeyId = ''
+const secretAccessKey = ''
 
 /* GET users listing. */
 
